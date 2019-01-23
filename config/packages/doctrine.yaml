@@ -3,13 +3,14 @@ parameters:
     # This allows you to run cache:warmup even if your
     # environment variables are not available yet.
     # You should not need to change this value.
-    env(DATABASE_URL): ''
+        env(DATABASE_URL): 'sqlite:///%kernel.project_dir%/var/awslist.db'
 
 doctrine:
     dbal:
         # configure these for your database server
         driver: 'pdo_slqlite'
-        url: '%env(resolve:DATABASE_URL)%'
+        server_version: '5.7'
+        url: 'sqlite:///%kernel.project_dir%/var/awslist.db'
     orm:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore

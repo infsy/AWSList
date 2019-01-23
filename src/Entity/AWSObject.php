@@ -36,6 +36,15 @@ class AWSObject
      */
     private $AWSDeletionTime;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=false)
+     */
+    private $AWSFirstDetection;
+    /**
+     * @ORM\Column(type="datetime", nullable=false)
+     */
+    private $AWSLastDetection;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -85,6 +94,30 @@ class AWSObject
     public function setAWSDeletionTime(?\DateTimeInterface $AWSDeletionTime): self
     {
         $this->AWSDeletionTime = $AWSDeletionTime;
+
+        return $this;
+    }
+
+    public function getAWSFirstDetection(): ?\DateTimeInterface
+    {
+        return $this->AWSFirstDetection;
+    }
+
+    public function setAWSFirstDetection(\DateTimeInterface $AWSFirstDetection): self
+    {
+        $this->AWSFirstDetection = $AWSFirstDetection;
+
+        return $this;
+    }
+
+    public function getAWSLastDetection(): ?\DateTimeInterface
+    {
+        return $this->AWSLastDetection;
+    }
+
+    public function setAWSLastDetection(\DateTimeInterface $AWSLastDetection): self
+    {
+        $this->AWSLastDetection = $AWSLastDetection;
 
         return $this;
     }
