@@ -27,8 +27,21 @@ class ListResourcesCommand extends ContainerAwareCommand
 		$em = $this->getContainer()->get('doctrine')->getManager();
 		$em->getConnection()->getConfiguration()->setSQLLogger(null);
 		
-		
+		// Déclaration of resources we want to check
+		$listResources = array(
+			"AWS::EC2::Instance",
+			"AWS::EC2::VPC",
+			"AWS::RDS::DBInstance",
+			// "AWS::DynamoDB::Table",
+			// "AWS::Lambda::Function",
+			"AWS::IAM::User",
+			// "AWS::EC2::Volume",
+			// "AWS::EC2::EIP",
+			// See https://docs.aws.amazon.com/cli/latest/reference/configservice/list-discovered-resources.html for complete list"
+			"AWS::S3::Bucket");
 		//
+		$output->writeln('Type of object checked : ');
+		print_r($listResources);	
 		// Get list of AWS Regions through EC2 describeRegions command
 		$ec2client = Ec2Client::factory(array(
 			'profile' => 'awslabs1',
@@ -53,18 +66,13 @@ class ListResourcesCommand extends ContainerAwareCommand
 			}
 			else
 			{
-			foreach($result['ConfigurationRecordersStatus'] as $region) {
-					$output->writeln('Recorded');
-					
-					// List EC2 resources
-					$resourceType = 'AWS::EC2::Instance';
+				$output->writeln('Recorded');
+				foreach($listResources as $resourceType) {
 					$resultResource = $client->listDiscoveredResources(array(
 					'resourceType' => $resourceType,
 					'includeDeletedResources' => true,
 					));
-					$nbResult = 0;
 					foreach($resultResource['resourceIdentifiers'] as $resource) {
-						$nbResult++;
 						unset($object);
 						$object = $em->getRepository('App:AWSObject')->findOneBy(
 							['AWSId' => $resource['resourceId']]);
@@ -84,119 +92,28 @@ class ListResourcesCommand extends ContainerAwareCommand
 						if (!empty($resource['resourceDeletionTime'])) {
 							$object->setAWSDeletionTime($resource['resourceDeletionTime']);
 						}
-						$object->setAWSLastDetection(new \DateTime());
-						$em->persist($object);
-						$em->flush();
-					}
-					$output->writeln($nbResult . ' ' . $resourceType . ' in this Region');
-
-
-					// List VPC resources
-					$resourceType = 'AWS::EC2::VPC';
-					$resultResource = $client->listDiscoveredResources(array(
-					'resourceType' => $resourceType,
-					'includeDeletedResources' => true,
-					));
-					$nbResult = 0;
-					foreach($resultResource['resourceIdentifiers'] as $resource) {
-						$nbResult++;
-						unset($object);
-						$object = $em->getRepository('App:AWSObject')->findOneBy(
-							['AWSId' => $resource['resourceId']]);
-						// If we can't retrieve object in the db, we create a new one
-						if (empty($object))
-						{
-							$object = new AWSObject();
-							$object->setAWSFirstDetection(new \DateTime());
-							$object->setAWSType($resource['resourceType']);
-							$object->setAWSId($resource['resourceId']);
-							$output->writeln('<error>Nouvelle resource '.$resource['resourceId'] . 'de type ' . $resource['resourceType'].'</error>');
+						if (empty($object->getAWSRegion())) {
+							$object->setAWSRegion($region['RegionName']);
 						}
-						// We add some info to the object
-						if (!empty($resource['resourceName'])) {
-							$object->setAWSName($resource['resourceName']);
-						}
-						if (!empty($resource['resourceDeletionTime'])) {
-							$object->setAWSDeletionTime($resource['resourceDeletionTime']);
+						if (empty($object->getAWSSubscription())) {
+							// TODO: InsertLoop with subscriptions configured in .aws folder
+							$object->setAWSSubscription('AWSLabs1');
 						}
 						$object->setAWSLastDetection(new \DateTime());
 						$em->persist($object);
 						$em->flush();
+					} // End of foreach resource of a type recorded in the Region
+				} // End of foreach ResourceType loop
+
+				$resultCounts = $client->getDiscoveredResourceCounts(array(
+				));
+				foreach ($resultCounts['resourceCounts'] as $resourceCount) {
+					if (in_array($resourceCount['resourceType'],$listResources)) {
+						$output->writeln($resourceCount['count'] . ' ' . $resourceCount['resourceType'] . ' in this Region');
 					}
-					$output->writeln($nbResult . ' ' . $resourceType . ' in this Region');
-
-
-					// List RDS resourcese
-					$resourceType = 'AWS::RDS::DBInstance';
-					$resultResource = $client->listDiscoveredResources(array(
-					'resourceType' => $resourceType,
-					'includeDeletedResources' => true,
-					));
-					$nbResult = 0;
-					foreach($resultResource['resourceIdentifiers'] as $resource) {
-						$nbResult++;
-						unset($object);
-						$object = $em->getRepository('App:AWSObject')->findOneBy(
-							['AWSId' => $resource['resourceId']]);
-						// If we can't retrieve object in the db, we create a new one
-						if (empty($object))
-						{
-							$object = new AWSObject();
-							$object->setAWSFirstDetection(new \DateTime());
-							$object->setAWSType($resource['resourceType']);
-							$object->setAWSId($resource['resourceId']);
-							$output->writeln('<error>Nouvelle resource '.$resource['resourceId'] . 'de type ' . $resource['resourceType'].'</error>');
-						}
-						// We add some info to the object
-						if (!empty($resource['resourceName'])) {
-							$object->setAWSName($resource['resourceName']);
-						}
-						if (!empty($resource['resourceDeletionTime'])) {
-							$object->setAWSDeletionTime($resource['resourceDeletionTime']);
-						}
-						$object->setAWSLastDetection(new \DateTime());
-						$em->persist($object);
-						$em->flush();
-					}
-					$output->writeln($nbResult . ' ' . $resourceType . ' in this Region');
-
-
-					// List S3 resources
-					$resourceType = 'AWS::S3::Bucket';
-					$resultResource = $client->listDiscoveredResources(array(
-					'resourceType' => $resourceType,
-					'includeDeletedResources' => true,
-					));
-					$nbResult = 0;
-					foreach($resultResource['resourceIdentifiers'] as $resource) {
-						$nbResult++;
-						unset($object);
-						$object = $em->getRepository('App:AWSObject')->findOneBy(
-							['AWSId' => $resource['resourceId']]);
-						// If we can't retrieve object in the db, we create a new one
-						if (empty($object))
-						{
-							$object = new AWSObject();
-							$object->setAWSFirstDetection(new \DateTime());
-							$object->setAWSType($resource['resourceType']);
-							$object->setAWSId($resource['resourceId']);
-							$output->writeln('<error>Nouvelle resource '.$resource['resourceId'] . 'de type ' . $resource['resourceType'].'</error>');
-						}
-						// We add some info to the object
-						if (!empty($resource['resourceName'])) {
-							$object->setAWSName($resource['resourceName']);
-						}
-						if (!empty($resource['resourceDeletionTime'])) {
-							$object->setAWSDeletionTime($resource['resourceDeletionTime']);
-						}
-						$object->setAWSLastDetection(new \DateTime());
-						$em->persist($object);
-						$em->flush();
-					}
-					$output->writeln($nbResult . ' ' . $resourceType . ' in this Region');
-			}
-			}
-		}
+				} // End of the loop to retrieve the count for each resource recorded and checked
+			} // End of condition if Config is recording in the Region
+		} //End of foreach Region loop
 	}
 }
 

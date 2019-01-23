@@ -32,6 +32,16 @@ class AWSObject
     private $AWSName;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $AWSRegion;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $AWSSubscription;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $AWSDeletionTime;
@@ -118,6 +128,30 @@ class AWSObject
     public function setAWSLastDetection(\DateTimeInterface $AWSLastDetection): self
     {
         $this->AWSLastDetection = $AWSLastDetection;
+
+        return $this;
+    }
+
+    public function getAWSRegion(): ?string
+    {
+        return $this->AWSRegion;
+    }
+
+    public function setAWSRegion(?string $AWSRegion): self
+    {
+        $this->AWSRegion = $AWSRegion;
+
+        return $this;
+    }
+
+    public function getAWSSubscription(): ?string
+    {
+        return $this->AWSSubscription;
+    }
+
+    public function setAWSSubscription(?string $AWSSubscription): self
+    {
+        $this->AWSSubscription = $AWSSubscription;
 
         return $this;
     }
