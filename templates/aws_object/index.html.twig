@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AWSObject index{% endblock %}
+
+{% block body %}
+    <h1>AWSObject index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>AWSId</th>
+                <th>AWSType</th>
+                <th>AWSName</th>
+                <th>AWSRegion</th>
+                <th>AWSSubscription</th>
+                <th>AWSDeletionTime</th>
+                <th>AWSFirstDetection</th>
+                <th>AWSLastDetection</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for a_w_s_object in a_w_s_objects %}
+            <tr>
+                <td>{{ a_w_s_object.id }}</td>
+                <td>{{ a_w_s_object.AWSId }}</td>
+                <td>{{ a_w_s_object.AWSType }}</td>
+                <td>{{ a_w_s_object.AWSName }}</td>
+                <td>{{ a_w_s_object.AWSRegion }}</td>
+                <td>{{ a_w_s_object.AWSSubscription }}</td>
+                <td>{{ a_w_s_object.AWSDeletionTime ? a_w_s_object.AWSDeletionTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ a_w_s_object.AWSFirstDetection ? a_w_s_object.AWSFirstDetection|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ a_w_s_object.AWSLastDetection ? a_w_s_object.AWSLastDetection|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('a_w_s_object_show', {'id': a_w_s_object.id}) }}">show</a>
+                    <a href="{{ path('a_w_s_object_edit', {'id': a_w_s_object.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('a_w_s_object_new') }}">Create new</a>
+{% endblock %}

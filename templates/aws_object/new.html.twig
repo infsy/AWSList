@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New AWSObject{% endblock %}
+
+{% block body %}
+    <h1>Create new AWSObject</h1>
+
+    {{ include('a_w_s_object/_form.html.twig') }}
+
+    <a href="{{ path('a_w_s_object_index') }}">back to list</a>
+{% endblock %}

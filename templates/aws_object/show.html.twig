@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AWSObject{% endblock %}
+
+{% block body %}
+    <h1>AWSObject</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ a_w_s_object.id }}</td>
+            </tr>
+            <tr>
+                <th>AWSId</th>
+                <td>{{ a_w_s_object.AWSId }}</td>
+            </tr>
+            <tr>
+                <th>AWSType</th>
+                <td>{{ a_w_s_object.AWSType }}</td>
+            </tr>
+            <tr>
+                <th>AWSName</th>
+                <td>{{ a_w_s_object.AWSName }}</td>
+            </tr>
+            <tr>
+                <th>AWSRegion</th>
+                <td>{{ a_w_s_object.AWSRegion }}</td>
+            </tr>
+            <tr>
+                <th>AWSSubscription</th>
+                <td>{{ a_w_s_object.AWSSubscription }}</td>
+            </tr>
+            <tr>
+                <th>AWSDeletionTime</th>
+                <td>{{ a_w_s_object.AWSDeletionTime ? a_w_s_object.AWSDeletionTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>AWSFirstDetection</th>
+                <td>{{ a_w_s_object.AWSFirstDetection ? a_w_s_object.AWSFirstDetection|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>AWSLastDetection</th>
+                <td>{{ a_w_s_object.AWSLastDetection ? a_w_s_object.AWSLastDetection|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('a_w_s_object_index') }}">back to list</a>
+
+    <a href="{{ path('a_w_s_object_edit', {'id': a_w_s_object.id}) }}">edit</a>
+
+    {{ include('a_w_s_object/_delete_form.html.twig') }}
+{% endblock %}
